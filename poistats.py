@@ -22,8 +22,8 @@ if '__main__' == __name__:
     sql = 'create table %s as select a.gid,b.gid from %s a,%s b ' \
           'where a.geom && b.geom ' \
           'and st_within(b.geom, st_buffer(a.geom,%f))' % (t_result, parcle_table, poi_table, buffer_radius)
-    curtime = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time()))
+    curtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     print 'start computing:%s' % curtime
     connection.execute(sql)
-    curtime = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time()))
+    curtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     print 'end computing:%s' % curtime
