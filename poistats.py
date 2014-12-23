@@ -10,6 +10,7 @@ def check_table(conn, tablename):
     if int(rexist[0]['count']) != 0:
         sql = "drop table '%s'" % tablename
         connection.execute(sql)
+        connection.commit()
 
 
 if '__main__' == __name__:
@@ -25,5 +26,6 @@ if '__main__' == __name__:
     curtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     print 'start computing:%s' % curtime
     connection.execute(sql)
+    connection.commit()
     curtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     print 'end computing:%s' % curtime
