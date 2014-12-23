@@ -5,10 +5,10 @@ import time
 
 def check_table(conn, tablename):
     #判断表是否存在
-    sql = 'select count(*) as count from pg_class where relname = %s' % tablename
+    sql = "select count(*) as count from pg_class where relname = '%s'" % tablename
     rexist = conn.query(sql)
     if int(rexist[0]['count']) != 0:
-        sql = 'drop table %s' % tablename
+        sql = "drop table '%s'" % tablename
         connection.execute(sql)
 
 
