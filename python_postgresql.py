@@ -81,7 +81,7 @@ class Connection(object):
     def _execute(self, cursor, query, parameters):
         try:
             return cursor.execute(query, parameters)
-        except OperationalError:
+        except:
             logging.error("Error connecting to PostgreSQL on %s", self.host)
             self.close()
             raise
