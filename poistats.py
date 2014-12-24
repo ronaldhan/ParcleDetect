@@ -26,8 +26,28 @@ def build_pair(result_table, polygon_table, point_table, radius=5.0):
     print 'build polygon-point pair end computing:%s' % curtime
 
 
-def parcle_change(conn, parcle_change_table):
-    pass
+def parcle_change(conn, poi_in_parcle):
+    sql = 'select distinct poly_gid, bz_new,utl from %s order by poly_gid asc' % poi_in_parcle
+    pip = conn.query(sql)
+    for row in pip:
+        gid = row['poly_gid']
+        bz_new = row['bz_new']
+        utl = row['utl']
+        sql = 'select catalog, count(*) as count from %s where poly_gid=%s ' \
+              'group by subcatalog' % (poi_in_parcle, gid)
+        groups = conn.query(sql)
+        result = []
+        poi = {}
+        pair = {}
+        for group in groups:
+            catalog = group['catalog']
+            ccount = group['count']
+            poi['catalog'] = catalog
+            poi['count'] = ccount
+            result.append(poi)
+        pair['result'] = result
+        pair['bz_new'] = bz_new
+        pair['utl'] = utl
 
 if '__main__' == __name__:
     connection = myconn.Connection(host='localhost', database='postgis', user='postgres', password='ronald')
