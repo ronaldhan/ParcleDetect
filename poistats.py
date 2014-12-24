@@ -13,6 +13,18 @@ def check_table(conn, tablename):
         connection.commit()
 
 
+def build_pair(result_table, polygon_table, point_table, radius=5.0):
+    sql = 'create table %s as select a.gid as poly_gid,b.gid as point_gid from %s a,%s b ' \
+          'where a.geom && b.geom ' \
+          'and st_within(b.geom, st_buffer(a.geom,%f))' % (result_table, polygon_table, point_table, radius)
+    curtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+    print 'build polygon-point pair start computing:%s' % curtime
+    connection.execute(sql)
+    connection.commit()
+    curtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+    print 'build polygon-point pair end computing:%s' % curtime
+
+
 if '__main__' == __name__:
     connection = myconn.Connection(host='localhost', database='postgis', user='postgres', password='ronald')
     poi_table = 'bdditu1'
@@ -20,12 +32,4 @@ if '__main__' == __name__:
     t_result = 'poi_in_parcle'
     buffer_radius = 5.0
     check_table(connection, t_result)
-    sql = 'create table %s as select a.gid as poly_gid,b.gid as point_gid from %s a,%s b ' \
-          'where a.geom && b.geom ' \
-          'and st_within(b.geom, st_buffer(a.geom,%f))' % (t_result, parcle_table, poi_table, buffer_radius)
-    curtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-    print 'start computing:%s' % curtime
-    connection.execute(sql)
-    connection.commit()
-    curtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-    print 'end computing:%s' % curtime
+    build_pair(t_result, parcle_table, poi_table, buffer_radius)
