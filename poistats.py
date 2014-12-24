@@ -8,7 +8,7 @@ def check_table(conn, tablename):
     sql = "select count(*) as count from pg_class where relname = '%s'" % tablename
     rexist = conn.query(sql)
     if int(rexist[0]['count']) != 0:
-        sql = "drop table '%s'" % tablename
+        sql = "drop table %s" % tablename
         connection.execute(sql)
         connection.commit()
 
@@ -27,7 +27,7 @@ def build_pair(result_table, polygon_table, point_table, radius=5.0):
 
 
 def parcle_change(conn, parcle_change_table):
-
+    pass
 
 if '__main__' == __name__:
     connection = myconn.Connection(host='localhost', database='postgis', user='postgres', password='ronald')
@@ -37,4 +37,3 @@ if '__main__' == __name__:
     buffer_radius = 5.0
     check_table(connection, t_result)
     build_pair(t_result, parcle_table, poi_table, buffer_radius)
-    parcle_change(connection, t_result)
