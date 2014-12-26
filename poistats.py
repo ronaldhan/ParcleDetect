@@ -114,7 +114,9 @@ def judge_kinds(polystats, kinds):
         if count >= length/2:
             kinds = [result[0]['catalog']]
         else:
-            kinds = [result[0]['catalog'], result[1]['catalog']]
+            kinds.append(result[0]['catalog'])
+            if result[1]['catalog'] not in kinds:
+                kinds.append(result[1]['catalog'])
     return kinds
 
 
