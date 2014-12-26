@@ -16,24 +16,24 @@ def check_table(conn, tablename):
 
 def check_column(conn, tablename, columnname):
     #判断列是否存在于表中，如果存在，先清空，否则，创建列
-    sql = "SELECT a.attname,pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type" \
+    sql = "SELECT a.attname,pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type " \
           "FROM pg_catalog.pg_attribute a," \
-          "(SELECT c.oid FROM pg_catalog.pg_class c" \
-          "LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace" \
-          "WHERE (c.relname) =lower('%s')" \
-          "AND (n.nspname) = lower('public')) b" \
-          "WHERE a.attrelid = b.oid" \
+          "(SELECT c.oid FROM pg_catalog.pg_class c " \
+          "LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace " \
+          "WHERE (c.relname) =lower('%s') " \
+          "AND (n.nspname) = lower('public')) b " \
+          "WHERE a.attrelid = b.oid " \
           "AND a.attnum > 0 AND NOT a.attisdropped ORDER BY a.attnum" % tablename
     cols = conn.query(sql)
     col_names = []
     for col in cols:
         col_names.append(col['attname'])
     if columnname in col_names:
-        sql = 'update table %s set %s=null' % (tablename, columnname)
+        sql = 'update %s set %s=null' % (tablename, columnname)
         conn.execute(sql)
         conn.commit()
     else:
-        sql = 'alter table %s add column %s varcahr(20)' % (tablename, columnname)
+        sql = 'alter table %s add column %s character varying(20)' % (tablename, columnname)
         conn.execute(sql)
         conn.commit()
 
@@ -66,7 +66,7 @@ def parcle_change(conn, parcle_landuse, poi_in_parcle):
         # bz_new = row['bz_new']
         # utl = row['utl']
         sql = 'select catalog, count(*) as count from %s where poly_gid=%s ' \
-              'group by subcatalog order by count dsc' % (poi_in_parcle, gid)
+              'group by catalog order by count desc' % (poi_in_parcle, gid)
         groups = conn.query(sql)
         result = []
         poi = {}
@@ -85,7 +85,7 @@ def parcle_change(conn, parcle_landuse, poi_in_parcle):
         kinds = is_school(pair, kinds)
         # pair['result'] = kinds
         strkinds = ','.join(kinds)
-        sql = "update table %s set %s='%s' where poly_gid=%s" % (parcle_landuse, col_name, strkinds, gid)
+        sql = "update %s set %s='%s' where poly_gid=%s" % (parcle_landuse, col_name, strkinds, gid)
         conn.execute(sql)
         conn.commit()
 
@@ -97,7 +97,8 @@ def is_school(polystats, kinds):
         catalog = poi['catalog']
         if 'A3' in catalog:
             if catalog not in kinds:
-                kinds = [catalog]
+                kinds = []
+                kinds.append(catalog)
                 break
     return kinds
 
@@ -124,6 +125,7 @@ if '__main__' == __name__:
     t_result = 'poi_in_parcle'
     t_landuse = 'parcle_landuse'
     buffer_radius = 5.0
-    check_table(connection, t_result)
-    build_pair(connection, t_result, parcle_table, poi_table, buffer_radius)
+    # check_table(connection, t_result)
+    # build_pair(connection, t_result, parcle_table, poi_table, buffer_radius)
     parcle_change(connection, t_landuse, t_result)
+    print 'compute finished'
