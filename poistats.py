@@ -39,7 +39,7 @@ def check_column(conn, tablename, columnname):
 
 
 def build_pair(conn, result_table, polygon_table, point_table, radius=5.0):
-    sql = 'create table %s as select a.gid as poly_gid,a.bz_new,a.utl,' \
+    sql = 'create table %s as select a.gid as poly_gid,a.bz_new,a.utl,a.geom,' \
           'b.gid as point_gid,b.name,b.catalog,b.subcatalog from %s a,%s b ' \
           'where a.geom && b.geom ' \
           'and st_within(b.geom, st_buffer(a.geom,%f))' % (result_table, polygon_table, point_table, radius)
@@ -53,7 +53,7 @@ def build_pair(conn, result_table, polygon_table, point_table, radius=5.0):
 
 def parcle_change(conn, parcle_landuse, poi_in_parcle):
     check_table(conn, parcle_landuse)
-    sql = 'create table %s as select distinct poly_gid, bz_new,utl ' \
+    sql = 'create table %s as select distinct poly_gid, bz_new,utl,geom ' \
           'from %s order by poly_gid asc' % (parcle_landuse, poi_in_parcle)
     conn.execute(sql)
     conn.commit()
