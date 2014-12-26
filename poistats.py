@@ -57,12 +57,14 @@ def parcle_change(conn, parcle_landuse, poi_in_parcle):
           'from %s order by poly_gid asc' % (parcle_landuse, poi_in_parcle)
     conn.execute(sql)
     conn.commit()
+    col_name = 'poi_landuse'
+    check_column(conn, parcle_landuse, col_name)
     sql = 'select * from %s' % parcle_landuse
     pip = conn.query(sql)
     for row in pip:
         gid = row['poly_gid']
-        bz_new = row['bz_new']
-        utl = row['utl']
+        # bz_new = row['bz_new']
+        # utl = row['utl']
         sql = 'select catalog, count(*) as count from %s where poly_gid=%s ' \
               'group by subcatalog order by count dsc' % (poi_in_parcle, gid)
         groups = conn.query(sql)
@@ -83,7 +85,9 @@ def parcle_change(conn, parcle_landuse, poi_in_parcle):
         kinds = is_school(pair, kinds)
         # pair['result'] = kinds
         strkinds = ','.join(kinds)
-
+        sql = "update table %s set %s='%s' where poly_gid=%s" % (parcle_landuse, col_name, strkinds, gid)
+        conn.execute(sql)
+        conn.commit()
 
 
 def is_school(polystats, kinds):
@@ -122,3 +126,4 @@ if '__main__' == __name__:
     buffer_radius = 5.0
     check_table(connection, t_result)
     build_pair(connection, t_result, parcle_table, poi_table, buffer_radius)
+    parcle_change(connection, t_landuse, t_result)
